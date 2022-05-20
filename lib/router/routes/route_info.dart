@@ -4,17 +4,17 @@ abstract class RouteInfo {
   final String name;
   final Widget page;
   final Object? arguments;
-  final bool? isUnderyling;
   final Iterable<RouteInfo>? children;
 
   @mustCallSuper
   const RouteInfo({
     required this.name,
     required this.page,
-    this.isUnderyling,
     this.arguments,
     this.children,
   });
+
+  bool get isUnderyling => name.split('/').length > 1;
 }
 
 enum ModalTransition {
@@ -34,7 +34,6 @@ class PageRouteInfo extends RouteInfo {
           page: page,
           children: children,
           arguments: arguments,
-          isUnderyling: isUnderlying,
         );
 }
 
@@ -53,6 +52,5 @@ class ModalRouteInfo extends RouteInfo {
           name: name,
           page: page,
           arguments: arguments,
-          isUnderyling: isUnderlying,
         );
 }

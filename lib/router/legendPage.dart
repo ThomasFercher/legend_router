@@ -6,30 +6,26 @@ import 'package:legend_router/router/route_info_provider.dart';
 
 class LegendPage extends Page {
   final Widget child;
-  final String name;
-  final Object? arguments;
 
-  LegendPage({
+  const LegendPage({
     required this.child,
-    required this.name,
-    this.arguments,
-    LocalKey? key,
-  }) : super(key: key, arguments: arguments, name: name);
+    required super.name,
+    super.arguments,
+    super.key,
+  });
 
   @override
   Route createRoute(BuildContext context) {
     return PageRouteBuilder(
       settings: this,
-      transitionDuration: Duration(milliseconds: 200),
+      transitionDuration: const Duration(milliseconds: 240),
       pageBuilder: (BuildContext context, Animation<double> animation,
           Animation<double> secondaryAnimation) {
         return RouteInfoProvider(
           route: this,
-          child: CupertinoPageTransition(
-            primaryRouteAnimation: animation,
-            secondaryRouteAnimation: secondaryAnimation,
+          child: FadeTransition(
+            opacity: animation,
             child: child,
-            linearTransition: false,
           ),
         );
       },
@@ -39,15 +35,13 @@ class LegendPage extends Page {
 
 class LegendModalPage extends Page {
   final Widget child;
-  final String name;
-  final Object? arguments;
 
-  LegendModalPage({
+  const LegendModalPage({
     required this.child,
-    required this.name,
-    this.arguments,
-    LocalKey? key,
-  }) : super(key: key, arguments: arguments, name: name);
+    required super.name,
+    super.arguments,
+    super.key,
+  });
 
   @override
   Route createRoute(BuildContext context) {
@@ -57,7 +51,7 @@ class LegendModalPage extends Page {
       barrierColor: Colors.black12,
       barrierDismissible: true,
       fullscreenDialog: true,
-      transitionDuration: Duration(milliseconds: 200),
+      transitionDuration: const Duration(milliseconds: 240),
       pageBuilder: (BuildContext context, Animation<double> animation,
           Animation<double> secondaryAnimation) {
         return FadeTransition(

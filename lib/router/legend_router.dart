@@ -87,6 +87,10 @@ class LegendRouter extends InheritedWidget {
     return null;
   }
 
+  bool currentIsUnderlying() {
+    return routerDelegate.current?.isUnderyling ?? false;
+  }
+
   ///
   /// Invokes the [searchCurrent] Method with the current Route name and [routeDisplays]
   ///
