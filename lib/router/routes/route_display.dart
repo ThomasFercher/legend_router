@@ -17,6 +17,12 @@ abstract class RouteDisplay {
     required this.children,
     this.icon,
   });
+
+  const RouteDisplay.none()
+      : title = "",
+        route = "",
+        children = null,
+        icon = null;
 }
 
 class SimpleRouteDisplay extends RouteDisplay {

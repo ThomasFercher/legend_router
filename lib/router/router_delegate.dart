@@ -1,12 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:legend_router/router/route_info_provider.dart';
+import 'package:legend_router/router/routes/route_display.dart';
 import 'legend_router.dart';
 import 'routes/popup_route/legend_popup_route.dart';
 import 'routes/popup_route/popup_route_config.dart';
 
 abstract class NavigatorFrame {
   Widget buildFrame(
-      BuildContext context, Navigator navigator, RouteInfo? current);
+    BuildContext context,
+    Navigator navigator,
+    RouteInfo? current,
+    RouteDisplay? display,
+  );
 }
 
 abstract class ModalDependencies {
@@ -23,9 +28,13 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
 
   Iterable<RouteInfo> _routes = [];
   late RouteInfo? current;
+  late RouteDisplay? display;
+
+  final List<RouteDisplay> displays;
 
   LegendRouterDelegate({
     required this.frame,
+    required this.displays,
     this.modalDependencies,
   });
 
@@ -48,6 +57,31 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
     return null;
   }
 
+  ///
+  /// Recursive Method for searching a [RouteDisplay] with a given [route] in a given Iterable<RouteDisplay> of [displays].
+  ///
+  RouteDisplay? searchRouteDisplay(
+    Iterable<RouteDisplay> displays,
+    String route,
+  ) {
+    for (final RouteDisplay display in displays) {
+      if (route == display.route) {
+        return display;
+      } else if (display.children != null && display.children!.isNotEmpty) {
+        RouteDisplay? subDisplay = searchRouteDisplay(display.children!, route);
+        if (subDisplay != null) {
+          return subDisplay;
+        }
+      }
+    }
+    return null;
+  }
+
+  RouteDisplay? getDisplay() {
+    if (current == null) return null;
+    return searchRouteDisplay(displays, current!.name);
+  }
+
   RouteInfo? getCurrent(Page<dynamic> page) {
     return searchCurrentRouteInfo(_routes, page);
   }
@@ -68,6 +102,7 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
 
     // The Currently selected RouteInfo
     current = getCurrent(_pages.last);
+    display = getDisplay();
 
     if (frame != null) {
       return RouteInfoProvider(
@@ -81,9 +116,13 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
             observers: [
               HeroController(),
             ],
+            onUnknownRoute: (s) {
+              print(s);
+            },
             onGenerateRoute: onGenerateRoute,
           ),
           current,
+          display,
         ),
       );
     } else {

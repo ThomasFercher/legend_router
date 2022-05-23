@@ -13,16 +13,32 @@ const PageRouteInfo NOTFOUND = PageRouteInfo(
   page: SizedBox(),
 );
 
+extension RouteUtility on List<RouteInfo> {
+  List<RouteInfo> ex() {
+    List<RouteInfo> result = [];
+    for (final RouteInfo info in this) {
+      result.add(info);
+      if (info.children != null) {
+        result.addAll(info.children!.toList().ex());
+      }
+    }
+    return result;
+  }
+}
+
 // ignore: must_be_immutable
 class LegendRouter extends InheritedWidget {
   final LegendRouterDelegate routerDelegate;
+
   @override
   final Widget child;
+
   final List<RouteInfo> routes;
-  late final List<PageRouteInfo> pageRoutes;
-  late final List<ModalRouteInfo> modalRoutes;
+
   late final PageRouteInfo? notFound;
+
   final List<RouteDisplay> routeDisplays;
+
   BuildContext? context;
 
   LegendRouter({
@@ -32,10 +48,7 @@ class LegendRouter extends InheritedWidget {
     required this.routes,
     required this.routeDisplays,
     this.notFound = NOTFOUND,
-  }) : super(key: key, child: child) {
-    modalRoutes = routes.whereType<ModalRouteInfo>().toList();
-    pageRoutes = routes.whereType<PageRouteInfo>().toList();
-  }
+  }) : super(key: key, child: child);
 
   static LegendRouter of(BuildContext context) {
     final LegendRouter? result =

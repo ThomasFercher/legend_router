@@ -59,6 +59,52 @@ class RouteInfoProvider extends InheritedWidget {
     return null;
   }
 
+  ///
+  ///
+  ///
+  static RouteInfo? getParentRouteInfo(
+    BuildContext context,
+    RouteInfo current,
+  ) {
+    List<String> parent = current.name.split('/');
+    if (parent.length > 1) {
+      String parentRoute = parent.sublist(0, parent.length - 1).join('/');
+
+      return searchRouteInfo(LegendRouter.of(context).routes, parentRoute);
+    } else {
+      return null;
+    }
+  }
+
+  ///
+  ///
+  ///
+  static RouteInfo? getRouteInfo(BuildContext context) {
+    RouteSettings route = RouteInfoProvider.of(context).route;
+    List<RouteInfo> routes = LegendRouter.of(context).routes;
+    if (route.name == null || route.name!.isEmpty) {
+      return null;
+    }
+    return searchRouteInfo(routes, route.name!);
+  }
+
+  ///
+  ///
+  ///
+  static RouteInfo? searchRouteInfo(Iterable<RouteInfo> routes, String route) {
+    for (final RouteInfo info in routes) {
+      if (info.name == route) {
+        return info;
+      } else if (info.children != null && info.children!.isNotEmpty) {
+        RouteInfo? subRoute = searchRouteInfo(info.children!, route);
+        if (subRoute != null) {
+          return subRoute;
+        }
+      }
+    }
+    return null;
+  }
+
   static RouteDisplay? getParentRouteDisplay(BuildContext context) {
     RouteSettings? route = RouteInfoProvider.of(context).route;
     List<RouteDisplay> options = LegendRouter.of(context).routeDisplays;
