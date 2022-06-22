@@ -116,9 +116,6 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
             observers: [
               HeroController(),
             ],
-            onUnknownRoute: (s) {
-              print(s);
-            },
             onGenerateRoute: onGenerateRoute,
           ),
           current,

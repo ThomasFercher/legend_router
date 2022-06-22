@@ -7,14 +7,12 @@ class LegendRouteInformationParser
   @override
   Future<List<RouteSettings>> parseRouteInformation(
       RouteInformation routeInformation) {
-    print("vcasdas");
     final uri = Uri.parse(routeInformation.location!);
-    print(uri);
 
     if (uri.pathSegments.isEmpty) {
       return Future.value(
         [
-          RouteSettings(
+          const RouteSettings(
             name: '/',
           ),
         ],
@@ -30,7 +28,7 @@ class LegendRouteInformationParser
           ),
         )
         .toList();
-    print(routeSettings);
+
     return Future.value(routeSettings);
   }
 
@@ -38,7 +36,6 @@ class LegendRouteInformationParser
   RouteInformation? restoreRouteInformation(configuration) {
     final String name;
     final String arguments;
-    print(configuration);
 
     if (configuration.isNotEmpty) {
       name = configuration.last.name ?? '';
