@@ -39,8 +39,6 @@ class LegendRouter extends InheritedWidget {
 
   final List<RouteDisplay> routeDisplays;
 
-  BuildContext? context;
-
   LegendRouter({
     Key? key,
     required this.routerDelegate,
@@ -54,8 +52,8 @@ class LegendRouter extends InheritedWidget {
     final LegendRouter? result =
         context.dependOnInheritedWidgetOfExactType<LegendRouter>();
     assert(result != null, 'No RouterProvider found in context');
-    result!.context = context;
-    return result;
+
+    return result!;
   }
 
   void pushPage({required RouteSettings settings, bool useKey = false}) {
@@ -114,27 +112,12 @@ class LegendRouter extends InheritedWidget {
     return option;
   }
 
-  /// Should only be used to push Dialogs that are outside of the content or are overallaping AppBar or Sider
-  void pushGlobalModal({required RouteSettings settings, bool useKey = false}) {
-    RouteInfo info = getRouteWidget(settings, routes);
-
-    if (info is ModalRouteInfo) {
-      Page<dynamic> p = createPage(settings, info);
-
-      Navigator.of(context!).pushNamed(info.name);
-    }
-  }
-
   void popPage({bool useKey = false}) {
     if (useKey) {
       routerDelegate.navigatorKey?.currentState?.pop();
     } else {
       routerDelegate.popRoute();
     }
-  }
-
-  void popModal() {
-    Navigator.of(context!).pop();
   }
 
   static RouteInfo getRouteWidget(RouteSettings s, Iterable<RouteInfo> routes) {
