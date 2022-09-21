@@ -2,8 +2,6 @@ import 'package:flutter/widgets.dart';
 
 import 'package:legend_router/router/legend_router.dart';
 
-import 'routes/route_display.dart';
-
 class RouteInfoProvider extends InheritedWidget {
   final RouteSettings route;
 
@@ -29,35 +27,15 @@ class RouteInfoProvider extends InheritedWidget {
   /// This Method returns the RouteDisplay of the active Route
   /// The [context] is needed for accessing this class in a static way.
   ///
-  static RouteDisplay? getRouteDisplay(BuildContext context) {
+  /* static RouteDisplay? getRouteDisplay(BuildContext context) {
     RouteSettings route = RouteInfoProvider.of(context).route;
-    List<RouteDisplay> options = LegendRouter.of(context).routeDisplays;
+    List<RouteDisplay> options = LegendRouter.of(context).routes;
     String? routeName = route.name;
     if (routeName == null || routeName.isEmpty) {
       return null;
     }
     return searchRouteDisplay(options, routeName);
-  }
-
-  ///
-  /// Recursive Method for searching a [RouteDisplay] with a given [route] in a given Iterable<RouteDisplay> of [displays].
-  ///
-  static RouteDisplay? searchRouteDisplay(
-    Iterable<RouteDisplay> displays,
-    String route,
-  ) {
-    for (final RouteDisplay display in displays) {
-      if (route == display.route) {
-        return display;
-      } else if (display.children != null && display.children!.isNotEmpty) {
-        RouteDisplay? subDisplay = searchRouteDisplay(display.children!, route);
-        if (subDisplay != null) {
-          return subDisplay;
-        }
-      }
-    }
-    return null;
-  }
+  }*/
 
   ///
   ///
@@ -67,6 +45,7 @@ class RouteInfoProvider extends InheritedWidget {
     RouteInfo current,
   ) {
     List<String> parent = current.name.split('/');
+    if (current.depth == 0) return null;
     if (parent.length > 1) {
       String parentRoute = parent.sublist(0, parent.length - 1).join('/');
 
@@ -105,9 +84,9 @@ class RouteInfoProvider extends InheritedWidget {
     return null;
   }
 
-  static RouteDisplay? getParentRouteDisplay(BuildContext context) {
+  /* static RouteDisplay? getParentRouteDisplay(BuildContext context) {
     RouteSettings? route = RouteInfoProvider.of(context).route;
-    List<RouteDisplay> options = LegendRouter.of(context).routeDisplays;
+    List<RouteDisplay> options = LegendRouter.of(context).routes;
 
     if (route.name == null) {
       return null;
@@ -142,5 +121,5 @@ class RouteInfoProvider extends InheritedWidget {
     }
 
     return null;
-  }
+  }*/
 }

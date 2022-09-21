@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:legend_router/router/route_info_provider.dart';
-import 'package:legend_router/router/routes/route_display.dart';
+
 import 'legendPage.dart';
 import 'router_delegate.dart';
 import 'routes/route_info.dart';
 export 'errorpages/notfound.dart';
 export 'router_delegate.dart';
 export 'routes/route_info.dart';
-
-const PageRouteInfo NOTFOUND = PageRouteInfo(
-  name: "Not Found",
-  page: SizedBox(),
-);
 
 extension RouteUtility on List<RouteInfo> {
   List<RouteInfo> ex() {
@@ -35,17 +30,19 @@ class LegendRouter extends InheritedWidget {
 
   final List<RouteInfo> routes;
 
-  late final PageRouteInfo? notFound;
+  static final PageRouteInfo notFound = PageRouteInfo(
+    name: "Not Found",
+    page: const SizedBox(),
+    title: 't',
+  );
 
-  final List<RouteDisplay> routeDisplays;
+  // final List<RouteDisplay> routeDisplays;
 
-  LegendRouter({
+  const LegendRouter({
     Key? key,
     required this.routerDelegate,
     required this.child,
     required this.routes,
-    required this.routeDisplays,
-    this.notFound = NOTFOUND,
   }) : super(key: key, child: child);
 
   static LegendRouter of(BuildContext context) {
@@ -68,36 +65,6 @@ class LegendRouter extends InheritedWidget {
     }
   }
 
-  List<RouteDisplay> get getRouteDisplays => List.of(findAll(routeDisplays));
-
-  ///
-  /// Returns all RouteDisplays parents and children,
-  ///
-  List<RouteDisplay> findAll(Iterable<RouteDisplay> list) {
-    List<RouteDisplay> items = [];
-    for (final RouteDisplay item in list) {
-      items.add(item);
-      if (item.children != null && item.children!.isNotEmpty) {
-        items.addAll(item.children!);
-      }
-    }
-    return items;
-  }
-
-  ///
-  /// Searches the currently selected [RouteDisplay]
-  ///
-  RouteDisplay? searchCurrent(Iterable<RouteDisplay> options, String name) {
-    for (final RouteDisplay option in options) {
-      if (option.route == name) return option;
-      if (option.children != null) {
-        RouteDisplay? co = searchCurrent(option.children!, name);
-        if (co != null) return co;
-      }
-    }
-    return null;
-  }
-
   bool currentIsUnderlying() {
     return routerDelegate.current?.isUnderyling ?? false;
   }
@@ -105,12 +72,12 @@ class LegendRouter extends InheritedWidget {
   ///
   /// Invokes the [searchCurrent] Method with the current Route name and [routeDisplays]
   ///
-  RouteDisplay? getCurrent() {
+  /*RouteDisplay? getCurrent() {
     String? name = routerDelegate.current?.name;
     if (name == null || name.isEmpty) return null;
     RouteDisplay? option = searchCurrent(routeDisplays, name);
     return option;
-  }
+  }*/
 
   void popPage({bool useKey = false}) {
     if (useKey) {
@@ -122,7 +89,7 @@ class LegendRouter extends InheritedWidget {
 
   static RouteInfo getRouteWidget(RouteSettings s, Iterable<RouteInfo> routes) {
     if (routes.isEmpty) {
-      return NOTFOUND;
+      return notFound;
     }
 
     for (final RouteInfo routeinfo in routes) {
@@ -139,7 +106,7 @@ class LegendRouter extends InheritedWidget {
       }
     }
 
-    return NOTFOUND;
+    return notFound;
   }
 
   static Page<dynamic> createPage(
