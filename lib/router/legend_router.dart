@@ -21,29 +21,23 @@ extension RouteUtility on List<RouteInfo> {
   }
 }
 
-// ignore: must_be_immutable
 class LegendRouter extends InheritedWidget {
   final LegendRouterDelegate routerDelegate;
 
-  @override
-  final Widget child;
-
   final List<RouteInfo> routes;
 
-  static final PageRouteInfo notFound = PageRouteInfo(
+  static const PageRouteInfo notFound = PageRouteInfo(
     name: "Not Found",
-    page: const SizedBox(),
+    page: SizedBox(),
     title: 't',
   );
 
-  // final List<RouteDisplay> routeDisplays;
-
   const LegendRouter({
-    Key? key,
+    super.key,
     required this.routerDelegate,
-    required this.child,
+    required super.child,
     required this.routes,
-  }) : super(key: key, child: child);
+  });
 
   static LegendRouter of(BuildContext context) {
     final LegendRouter? result =
@@ -68,16 +62,6 @@ class LegendRouter extends InheritedWidget {
   bool currentIsUnderlying() {
     return routerDelegate.current?.isUnderyling ?? false;
   }
-
-  ///
-  /// Invokes the [searchCurrent] Method with the current Route name and [routeDisplays]
-  ///
-  /*RouteDisplay? getCurrent() {
-    String? name = routerDelegate.current?.name;
-    if (name == null || name.isEmpty) return null;
-    RouteDisplay? option = searchCurrent(routeDisplays, name);
-    return option;
-  }*/
 
   void popPage({bool useKey = false}) {
     if (useKey) {
