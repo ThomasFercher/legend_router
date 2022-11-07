@@ -41,14 +41,12 @@ class PageRouteInfo extends RouteInfo {
 }
 
 class ModalRouteInfo extends RouteInfo {
-  final double width;
   final ModalTransition transition;
 
   const ModalRouteInfo({
     required super.name,
     required super.page,
     required super.title,
-    required this.width,
     super.arguments,
     super.children,
     super.icon,

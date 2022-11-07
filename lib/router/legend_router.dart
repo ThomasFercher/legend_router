@@ -9,12 +9,12 @@ export 'router_delegate.dart';
 export 'routes/route_info.dart';
 
 extension RouteUtility on List<RouteInfo> {
-  List<RouteInfo> ex() {
+  List<RouteInfo> expandChildren() {
     List<RouteInfo> result = [];
     for (final RouteInfo info in this) {
       result.add(info);
       if (info.children != null) {
-        result.addAll(info.children!.toList().ex());
+        result.addAll(info.children!.toList().expandChildren());
       }
     }
     return result;
@@ -61,6 +61,10 @@ class LegendRouter extends InheritedWidget {
 
   bool currentIsUnderlying() {
     return routerDelegate.current?.isUnderyling ?? false;
+  }
+
+  bool isFirstOnStack() {
+    return routerDelegate.currentConfiguration.length == 1;
   }
 
   void popPage({bool useKey = false}) {
