@@ -48,12 +48,8 @@ class LegendRouter extends InheritedWidget {
     return result!;
   }
 
-  List<RouteInfo> getTopRoutes<T>() {
-    return routes
-        .get<PageRouteInfo>()
-        .where((route) => route.depth == 1)
-        .toList();
-  }
+  List<RouteInfo> get topRoutes =>
+      routes.get<PageRouteInfo>().where((route) => route.depth == 1).toList();
 
   void pushPage({required RouteSettings settings, bool useKey = false}) {
     RouteInfo info = getRouteWidget(settings, routes);
