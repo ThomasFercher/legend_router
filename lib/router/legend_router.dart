@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:legend_router/router/route_info_provider.dart';
+import 'package:legend_router/router/routes/extensions.dart';
 
 import 'legendPage.dart';
 import 'router_delegate.dart';
@@ -45,6 +46,13 @@ class LegendRouter extends InheritedWidget {
     assert(result != null, 'No RouterProvider found in context');
 
     return result!;
+  }
+
+  List<RouteInfo> getTopRoutes<T>() {
+    return routes
+        .get<PageRouteInfo>()
+        .where((route) => route.depth == 1)
+        .toList();
   }
 
   void pushPage({required RouteSettings settings, bool useKey = false}) {
