@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
-import 'package:legend_router/router/legend_router.dart';
-
-import '../route_info_provider.dart';
-import '../routes/route_info.dart';
+import 'package:legend_router/src/entities/routes/route_config.dart';
+import 'information_provider.dart';
 
 ///
 /// In case you have two Navigators in your app and the upper Navigator is only used for modals which
@@ -21,11 +18,13 @@ class GlobalModal {
     );
   }
 
-  static CupertinoDialogRoute<dynamic>? modalRouteBuilder(
-      RouteSettings settings, BuildContext context, WidgetBuilder builder) {
+  static CupertinoDialogRoute<dynamic> modalRouteBuilder(
+    RouteSettings settings,
+    BuildContext context,
+    WidgetBuilder builder,
+  ) {
     return CupertinoDialogRoute(
       barrierDismissible: true,
-      settings: settings,
       transitionDuration: const Duration(
         milliseconds: 400,
       ),
@@ -46,7 +45,10 @@ class GlobalModal {
       },
       //   useSafeArea: false,
       builder: (context) => RouteInfoProvider(
-        route: settings,
+        route: RouteConfig(
+          name: settings.name,
+          arguments: settings.arguments,
+        ),
         child: Builder(
           builder: (context) {
             return builder(context);

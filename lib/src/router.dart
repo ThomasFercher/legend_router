@@ -1,37 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:legend_router/router/route_info_provider.dart';
-import 'package:legend_router/router/routes/extensions.dart';
+import 'package:legend_router/src/information_provider.dart';
+import 'package:legend_router/src/entities/routes/extensions.dart';
 
-import 'legendPage.dart';
-import 'router_delegate.dart';
-import 'routes/route_info.dart';
-export 'errorpages/notfound.dart';
-export 'router_delegate.dart';
-export 'routes/route_info.dart';
+import 'entities/pages/legend_modal_page.dart';
+import 'entities/pages/legend_page.dart';
+import 'entities/pages/legend_scaffold_page.dart';
+import 'entities/routes/route_config.dart';
+import 'delegate.dart';
+import 'entities/routes/route_info.dart';
 
-extension RouteUtility on List<RouteInfo> {
-  List<RouteInfo> expandChildren() {
-    List<RouteInfo> result = [];
-    for (final RouteInfo info in this) {
-      result.add(info);
-      if (info.children != null) {
-        result.addAll(info.children!.toList().expandChildren());
-      }
-    }
-    return result;
-  }
-}
+const PageRouteInfo notFound = PageRouteInfo(
+  name: "/notFound",
+  page: SizedBox(),
+  title: 'Not Found',
+);
 
 class LegendRouter extends InheritedWidget {
   final LegendRouterDelegate routerDelegate;
-
   final List<RouteInfo> routes;
-
-  static const PageRouteInfo notFound = PageRouteInfo(
-    name: "Not Found",
-    page: SizedBox(),
-    title: 't',
-  );
 
   const LegendRouter({
     super.key,
@@ -48,37 +34,50 @@ class LegendRouter extends InheritedWidget {
     return result!;
   }
 
-  List<RouteInfo> get topRoutes =>
-      routes.get<PageRouteInfo>().where((route) => route.depth == 1).toList();
+  List<RouteInfo> get topRoutes {
+    return List.of(
+      routes.get<PageRouteInfo>().where(
+            (route) => route.depth == 1,
+          ),
+    );
+  }
 
   RouteInfo? get current => routerDelegate.current;
 
-  void pushPage({required RouteSettings settings, bool useKey = false}) {
-    RouteInfo info = getRouteWidget(settings, routes);
-
-    Page<dynamic> p = createPage(settings, info);
-
+  void pushPage(
+    String route, {
+    Map<String, dynamic>? urlArguments,
+    Object? arguments,
+    bool useKey = false,
+  }) {
     if (useKey) {
-      routerDelegate.navigatorKey?.currentState?.pushNamed(p.name ?? '');
-    } else {
-      routerDelegate.pushPage(p);
+      routerDelegate.navigatorKey?.currentState?.pushNamed(
+        route,
+        arguments: arguments,
+      );
+      return;
     }
+
+    final _routeConfig = RouteConfig(
+      name: route,
+      arguments: arguments,
+      urlArguments: urlArguments,
+    );
+
+    final info = getRouteWidget(_routeConfig, routes);
+    final page = createPage(_routeConfig, info);
+
+    routerDelegate.pushPage(page);
   }
 
-  bool currentIsUnderlying() {
-    return routerDelegate.current?.isUnderyling ?? false;
-  }
-
-  bool isFirstOnStack() {
-    return routerDelegate.currentConfiguration.length == 1;
-  }
+  bool get isFirstOnStack => routerDelegate.currentConfiguration.length == 1;
 
   void popPage({bool useKey = false}) {
     if (useKey) {
       routerDelegate.navigatorKey?.currentState?.pop();
-    } else {
-      routerDelegate.popRoute();
+      return;
     }
+    routerDelegate.popRoute();
   }
 
   static RouteInfo getRouteWidget(RouteSettings s, Iterable<RouteInfo> routes) {
@@ -103,8 +102,8 @@ class LegendRouter extends InheritedWidget {
     return notFound;
   }
 
-  static Page<dynamic> createPage(
-    RouteSettings s,
+  static LegendPage<dynamic> createPage(
+    RouteConfig s,
     RouteInfo info,
   ) {
     if (info is ModalRouteInfo) {
@@ -114,7 +113,10 @@ class LegendRouter extends InheritedWidget {
     }
   }
 
-  static Page<dynamic> createModalPage(RouteSettings s, ModalRouteInfo route) {
+  static LegendPage<dynamic> createModalPage(
+    RouteConfig s,
+    ModalRouteInfo route,
+  ) {
     return LegendModalPage(
       child: Stack(
         children: [
@@ -125,25 +127,27 @@ class LegendRouter extends InheritedWidget {
         ],
       ),
       name: route.name,
-      arguments: route.arguments,
+      arguments: s.arguments,
+      urlArguments: s.urlArguments,
       key: UniqueKey(),
     );
   }
 
-  static LegendPage createPageRoute(RouteSettings s, RouteInfo route) {
-    return LegendPage(
+  static LegendScaffoldPage createPageRoute(RouteConfig s, RouteInfo route) {
+    return LegendScaffoldPage(
       child: RouteInfoProvider(
         child: route.page,
         route: s,
       ),
       name: route.name,
-      arguments: route.arguments,
+      arguments: s.arguments,
+      urlArguments: s.urlArguments,
       key: UniqueKey(),
     );
   }
 
   @override
-  bool updateShouldNotify(covariant LegendRouter old) =>
+  bool updateShouldNotify(covariant LegendRouter oldWidget) =>
       routerDelegate.currentConfiguration !=
-      old.routerDelegate.currentConfiguration;
+      oldWidget.routerDelegate.currentConfiguration;
 }

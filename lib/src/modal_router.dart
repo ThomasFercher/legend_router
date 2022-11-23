@@ -4,12 +4,10 @@ class ModalRouter extends InheritedWidget {
   final GlobalKey<NavigatorState> navigatorKey;
 
   const ModalRouter({
-    Key? key,
-    required this.child,
+    super.key,
+    required super.child,
     required this.navigatorKey,
-  }) : super(key: key, child: child);
-
-  final Widget child;
+  });
 
   static ModalRouter of(BuildContext context) {
     final result = context.dependOnInheritedWidgetOfExactType<ModalRouter>();
@@ -18,8 +16,11 @@ class ModalRouter extends InheritedWidget {
   }
 
   /// Should only be used to push Dialogs that are outside of the content or are overallaping AppBar or Sider
-  void push({required RouteSettings settings, bool useKey = false}) {
-    navigatorKey.currentState?.pushNamed(settings.name ?? "");
+  void push(
+    String route, {
+    Object? arguments,
+  }) {
+    navigatorKey.currentState?.pushNamed(route, arguments: arguments);
   }
 
   void pop() {

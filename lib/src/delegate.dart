@@ -1,28 +1,22 @@
 import 'package:flutter/cupertino.dart';
-import 'package:legend_router/router/route_info_provider.dart';
-import 'legend_router.dart';
-import 'routes/popup_route/legend_popup_route.dart';
-import 'routes/popup_route/popup_route_config.dart';
+import 'package:legend_router/src/entities/pages/legend_page.dart';
+import 'package:legend_router/src/entities/frames/modal_frame.dart';
+import 'package:legend_router/src/entities/routes/route_config.dart';
+import 'package:legend_router/src/entities/routes/route_info.dart';
+import 'entities/frames/scaffold_frame.dart';
+import 'router.dart';
+import 'entities/routes/popup_route/legend_popup_route.dart';
+import 'entities/routes/popup_route/popup_route_config.dart';
 
-abstract class NavigatorFrame {
-  Widget buildFrame(
-    BuildContext context,
-    Navigator navigator,
-    RouteInfo? current,
-  );
-}
+const RouteConfig homeRoute = RouteConfig(name: '/');
 
-abstract class ModalDependencies {
-  Widget buildFrame(BuildContext context);
-}
+typedef LegendConfiguration = List<RouteConfig>;
 
-const RouteSettings homeRoute = RouteSettings(name: '/');
-
-class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
-    with ChangeNotifier, PopNavigatorRouterDelegateMixin<List<RouteSettings>> {
+class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
+    with ChangeNotifier, PopNavigatorRouterDelegateMixin<LegendConfiguration> {
   final NavigatorFrame? frame;
   final ModalDependencies? modalDependencies;
-  final List<Page<dynamic>> _pages = [];
+  final List<LegendPage<dynamic>> _pages = [];
 
   Iterable<RouteInfo> _routes = [];
   late RouteInfo? current;
@@ -73,21 +67,18 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
     current = getCurrent(_pages.last);
 
     if (frame != null) {
-      return RouteInfoProvider(
-        route: RouteSettings(name: current?.name ?? "/"),
-        child: frame!.buildFrame(
-          context,
-          Navigator(
-            pages: List.of(_pages),
-            key: navigatorKey,
-            onPopPage: _onPopPage,
-            observers: [
-              HeroController(),
-            ],
-            onGenerateRoute: onGenerateRoute,
-          ),
-          current,
+      return frame!.buildFrame(
+        context,
+        Navigator(
+          pages: List.of(_pages),
+          key: navigatorKey,
+          onPopPage: _onPopPage,
+          observers: [
+            HeroController(),
+          ],
+          onGenerateRoute: onGenerateRoute,
         ),
+        current,
       );
     } else {
       return Navigator(
@@ -119,7 +110,7 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
   }
 
   @override
-  List<Page> get currentConfiguration => List.of(_pages);
+  LegendConfiguration get currentConfiguration => List.of(_pages);
 
   @override
   Future<bool> popRoute() {
@@ -137,7 +128,7 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
     return true;
   }
 
-  void pushPage(Page page) {
+  void pushPage(LegendPage page) {
     if (_pages.last.key == page.key) {
       _pages[_pages.length - 1] = page;
     } else {
@@ -151,9 +142,9 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
   final navigatorKey = GlobalKey<NavigatorState>();
 
   @override
-  Future<void> setNewRoutePath(List<RouteSettings> configuration) {
-    List<Page> pages = [];
-    for (final RouteSettings s in configuration) {
+  Future<void> setNewRoutePath(configuration) {
+    List<LegendPage> pages = [];
+    for (final RouteConfig s in configuration) {
       pages.add(
         LegendRouter.createPage(
           s,
@@ -167,7 +158,7 @@ class LegendRouterDelegate extends RouterDelegate<List<RouteSettings>>
     return Future.value(null);
   }
 
-  void _setPath(List<Page> pages) {
+  void _setPath(List<LegendPage> pages) {
     _pages.clear();
     _pages.addAll(pages);
     if (_pages.first.name != '/') {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:legend_router/router/legend_router.dart';
-
+import 'package:legend_router/src/entities/frames/modal_frame.dart';
 import 'popup_route_config.dart';
 
 const Duration duration = Duration(milliseconds: 200);
