@@ -82,10 +82,6 @@ class LegendRouter extends InheritedWidget {
   }
 
   static RouteInfo getRouteWidget(RouteSettings s, Iterable<RouteInfo> routes) {
-    if (routes.isEmpty) {
-      return notFound;
-    }
-
     for (final RouteInfo routeinfo in routes) {
       if (routeinfo.name == s.name) {
         return routeinfo;

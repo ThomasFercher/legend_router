@@ -23,13 +23,15 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
   @override
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  Iterable<RouteInfo> _routes = [];
+  final Iterable<RouteInfo> _routes;
   late RouteInfo? current;
 
   LegendRouterDelegate({
     required this.frame,
     this.modalDependencies,
-  });
+    required Iterable<RouteInfo> routes,
+  })  : _routes = routes,
+        assert(routes.isNotEmpty);
 
   ///
   /// Searches the currently selected [RouteInfo] in the given scope of [_routes] with the currently
@@ -56,8 +58,6 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
 
   @override
   Widget build(BuildContext context) {
-    _routes = LegendRouter.of(context).routes;
-
     if (_pages.isEmpty) {
       _pages.insert(
         0,
