@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
+import 'package:legend_router/src/delegate.dart';
 import 'package:legend_router/src/entities/routes/route_config.dart';
 
 class LegendRouteInformationParser
-    extends RouteInformationParser<List<RouteConfig>> {
-  const LegendRouteInformationParser() : super();
+    extends RouteInformationParser<LegendConfiguration> {
+  const LegendRouteInformationParser();
 
   @override
-  Future<List<RouteConfig>> parseRouteInformation(
+  Future<LegendConfiguration> parseRouteInformation(
     RouteInformation routeInformation,
   ) {
     final uri = Uri.parse(routeInformation.location!);
@@ -31,7 +32,6 @@ class LegendRouteInformationParser
         );
       },
     ).toList();
-
     return Future.value(routeSettings);
   }
 
@@ -40,11 +40,9 @@ class LegendRouteInformationParser
     if (configuration.isEmpty) {
       return const RouteInformation();
     }
-
     final routeConfig = configuration.last;
     final name = routeConfig.name ?? '';
     final arguments = routeConfig.urlArguments.toUriArguments();
-
     return RouteInformation(location: '$name$arguments');
   }
 }

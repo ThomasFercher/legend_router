@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:legend_router/src/entities/pages/legend_page.dart';
 import 'package:legend_router/src/entities/frames/modal_frame.dart';
 import 'package:legend_router/src/entities/routes/route_config.dart';
@@ -16,7 +17,11 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<LegendConfiguration> {
   final NavigatorFrame? frame;
   final ModalDependencies? modalDependencies;
-  final List<LegendPage<dynamic>> _pages = [];
+
+  List<LegendPage<dynamic>> _pages = [];
+
+  @override
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   Iterable<RouteInfo> _routes = [];
   late RouteInfo? current;
@@ -73,9 +78,6 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
           pages: List.of(_pages),
           key: navigatorKey,
           onPopPage: _onPopPage,
-          observers: [
-            HeroController(),
-          ],
           onGenerateRoute: onGenerateRoute,
         ),
         current,
@@ -110,7 +112,7 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
   }
 
   @override
-  LegendConfiguration get currentConfiguration => List.of(_pages);
+  LegendConfiguration get currentConfiguration => _pages;
 
   @override
   Future<bool> popRoute() {
@@ -139,9 +141,6 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
   }
 
   @override
-  final navigatorKey = GlobalKey<NavigatorState>();
-
-  @override
   Future<void> setNewRoutePath(configuration) {
     List<LegendPage> pages = [];
     for (final RouteConfig s in configuration) {
@@ -155,14 +154,12 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
 
     _setPath(pages);
 
-    return Future.value(null);
+    return SynchronousFuture(null);
   }
 
   void _setPath(List<LegendPage> pages) {
-    _pages.clear();
-    _pages.addAll(pages);
-    if (_pages.first.name != '/') {
-      _pages.insert(
+    if (pages.first.name != '/') {
+      pages.insert(
         0,
         LegendRouter.createPage(
           homeRoute,
@@ -170,6 +167,8 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
         ),
       );
     }
+
+    _pages = pages;
     notifyListeners();
   }
 }
