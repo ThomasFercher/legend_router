@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:legend_router/src/entities/pages/not_found.dart';
 import 'package:legend_router/src/information_provider.dart';
 import 'package:legend_router/src/entities/routes/extensions.dart';
 
@@ -9,9 +10,9 @@ import 'entities/routes/route_config.dart';
 import 'delegate.dart';
 import 'entities/routes/route_info.dart';
 
-const PageRouteInfo notFound = PageRouteInfo(
+PageRouteInfo notFound = const PageRouteInfo(
   name: "/notFound",
-  page: SizedBox(),
+  page: NotFound(),
   title: 'Not Found',
 );
 
@@ -51,7 +52,7 @@ class LegendRouter extends InheritedWidget {
     bool useKey = false,
   }) {
     if (useKey) {
-      routerDelegate.navigatorKey?.currentState?.pushNamed(
+      routerDelegate.navigatorKey.currentState?.pushNamed(
         route,
         arguments: arguments,
       );
@@ -74,7 +75,7 @@ class LegendRouter extends InheritedWidget {
 
   void popPage({bool useKey = false}) {
     if (useKey) {
-      routerDelegate.navigatorKey?.currentState?.pop();
+      routerDelegate.navigatorKey.currentState?.pop();
       return;
     }
     routerDelegate.popRoute();

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:legend_router/src/delegate.dart';
 import 'package:legend_router/src/entities/routes/route_config.dart';
@@ -13,7 +14,7 @@ class LegendRouteInformationParser
     final uri = Uri.parse(routeInformation.location!);
 
     if (uri.pathSegments.isEmpty) {
-      return Future.value(
+      return SynchronousFuture(
         [
           const RouteConfig(
             name: '/',
@@ -22,17 +23,15 @@ class LegendRouteInformationParser
       );
     }
 
-    final routeSettings = uri.pathSegments.map(
-      (pathSegment) {
-        return RouteConfig(
-          name: '/$pathSegment',
-          arguments: null,
-          urlArguments:
-              pathSegment == uri.pathSegments.last ? uri.queryParameters : null,
-        );
-      },
-    ).toList();
-    return Future.value(routeSettings);
+    final routeSettings = RouteConfig(
+      name: uri.path,
+      arguments: null,
+      urlArguments: uri.queryParameters,
+    );
+
+    return SynchronousFuture([
+      routeSettings,
+    ]);
   }
 
   @override
@@ -40,6 +39,7 @@ class LegendRouteInformationParser
     if (configuration.isEmpty) {
       return const RouteInformation();
     }
+
     final routeConfig = configuration.last;
     final name = routeConfig.name ?? '';
     final arguments = routeConfig.urlArguments.toUriArguments();

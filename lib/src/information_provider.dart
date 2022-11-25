@@ -12,11 +12,11 @@ class RouteInfoProvider extends InheritedWidget {
     required this.route,
   }) : super(key: key, child: child);
 
-  static RouteInfoProvider of(BuildContext context) {
+  static RouteInfoProvider? of(BuildContext context) {
     final RouteInfoProvider? result =
         context.dependOnInheritedWidgetOfExactType<RouteInfoProvider>();
-    assert(result != null, 'No RouteInfoProvider found in context');
-    return result!;
+    //assert(result != null, 'No RouteInfoProvider found in context');
+    return result;
   }
 
   @override
