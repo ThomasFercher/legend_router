@@ -35,9 +35,9 @@ class LegendRouter extends InheritedWidget {
     return result!;
   }
 
-  List<RouteInfo> get topRoutes {
+  List<T> getTopRoutes<T extends PageRouteInfo>() {
     return List.of(
-      routes.get<PageRouteInfo>().where(
+      routes.get<T>().where(
             (route) => route.depth == 1,
           ),
     );
