@@ -140,6 +140,36 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
     notifyListeners();
   }
 
+  void replacePage(LegendPage page) {
+    _pages.removeLast();
+    pushPage(page);
+  }
+
+  void pushNamed(String name) {
+    pushPage(
+      LegendRouter.createPage(
+        RouteConfig(name: name),
+        LegendRouter.getRouteWidget(RouteConfig(name: name), _routes),
+      ),
+    );
+  }
+
+  void pushReplacementNamed(String name) {
+    _pages.removeLast();
+    pushNamed(name);
+  }
+
+  void popUntil(bool Function(LegendPage<dynamic> route) predicate) {
+    for (var page in _pages) {
+      if (predicate(page)) {
+        break;
+      }
+      _pages.remove(page);
+    }
+
+    notifyListeners();
+  }
+
   @override
   Future<void> setNewRoutePath(configuration) {
     List<LegendPage> pages = [];

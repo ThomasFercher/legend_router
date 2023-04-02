@@ -10,7 +10,7 @@ import 'entities/routes/route_config.dart';
 import 'delegate.dart';
 import 'entities/routes/route_info.dart';
 
-PageRouteInfo notFound = const PageRouteInfo(
+const notFound = PageRouteInfo(
   name: "/notFound",
   page: NotFound(),
   title: 'Not Found',
@@ -44,6 +44,10 @@ class LegendRouter extends InheritedWidget {
   }
 
   RouteInfo? get current => routerDelegate.current;
+
+  ///
+  /// Utility Functions
+  ///
 
   void pushPage(
     String route, {
@@ -80,6 +84,77 @@ class LegendRouter extends InheritedWidget {
     }
     routerDelegate.popRoute();
   }
+
+  void popUntil(bool Function(LegendPage<dynamic>) predicate) {
+    routerDelegate.popUntil(predicate);
+  }
+
+  void replacePage(
+    String route, {
+    Map<String, dynamic>? urlArguments,
+    Object? arguments,
+    bool useKey = false,
+  }) {
+    if (useKey) {
+      routerDelegate.navigatorKey.currentState?.pushReplacementNamed(
+        route,
+        arguments: arguments,
+      );
+      return;
+    }
+
+    final _routeConfig = RouteConfig(
+      name: route,
+      arguments: arguments,
+      urlArguments: urlArguments,
+    );
+
+    final info = getRouteWidget(_routeConfig, routes);
+    final page = createPage(_routeConfig, info);
+
+    routerDelegate.replacePage(page);
+  }
+
+  void pushReplacementNamed(
+    String route, {
+    bool useKey = false,
+  }) {
+    if (useKey) {
+      routerDelegate.navigatorKey.currentState?.pushReplacementNamed(route);
+      return;
+    }
+    routerDelegate.pushReplacementNamed(route);
+  }
+
+  void pushNamed(
+    String route, {
+    Map<String, dynamic>? urlArguments,
+    Object? arguments,
+    bool useKey = false,
+  }) {
+    if (useKey) {
+      routerDelegate.navigatorKey.currentState?.pushNamed(
+        route,
+        arguments: arguments,
+      );
+      return;
+    }
+
+    final _routeConfig = RouteConfig(
+      name: route,
+      arguments: arguments,
+      urlArguments: urlArguments,
+    );
+
+    final info = getRouteWidget(_routeConfig, routes);
+    final page = createPage(_routeConfig, info);
+
+    routerDelegate.pushPage(page);
+  }
+
+  ///
+  /// Delegate Functions
+  ///
 
   static RouteInfo getRouteWidget(RouteSettings s, Iterable<RouteInfo> routes) {
     for (final RouteInfo routeinfo in routes) {
