@@ -18,18 +18,18 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
   final NavigatorFrame? frame;
   final ModalDependencies? modalDependencies;
 
-  List<LegendPage<dynamic>> _pages = [];
-
   @override
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> navigatorKey;
 
   final Iterable<RouteInfo> _routes;
-  late RouteInfo? current;
+  RouteInfo? current;
+  List<LegendPage<dynamic>> _pages = [];
 
   LegendRouterDelegate({
     required this.frame,
     this.modalDependencies,
     required Iterable<RouteInfo> routes,
+    required this.navigatorKey,
   })  : _routes = routes,
         assert(routes.isNotEmpty);
 
@@ -82,17 +82,19 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
         ),
         current,
       );
-    } else {
-      return Navigator(
-        pages: List.of(_pages),
-        key: navigatorKey,
-        onPopPage: _onPopPage,
-        observers: [
-          HeroController(),
-        ],
-        onGenerateRoute: onGenerateRoute,
-      );
     }
+    return Navigator(
+      pages: List.of(_pages),
+      key: navigatorKey,
+      onPopPage: _onPopPage,
+      observers: [
+        HeroController(),
+      ],
+      onGenerateRoute: onGenerateRoute,
+      onGenerateInitialRoutes: (navigator, initialRoute) {
+        return [CupertinoPageRoute(builder: (context) => Container())];
+      },
+    );
   }
 
   Route<dynamic>? onGenerateRoute(RouteSettings s) {
@@ -131,7 +133,7 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
   }
 
   void pushPage(LegendPage page) {
-    if (_pages.last.key == page.key) {
+    if (_pages.isNotEmpty && _pages.last.key == page.key) {
       _pages[_pages.length - 1] = page;
     } else {
       _pages.add(page);
