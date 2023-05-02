@@ -4,6 +4,7 @@ import 'package:legend_router/src/entities/pages/legend_page.dart';
 import 'package:legend_router/src/entities/frames/modal_frame.dart';
 import 'package:legend_router/src/entities/routes/route_config.dart';
 import 'package:legend_router/src/entities/routes/route_info.dart';
+import 'package:legend_router/src/entities/routes/scaffold_route/scaffold_route.dart';
 import 'entities/frames/scaffold_frame.dart';
 import 'router.dart';
 import 'entities/routes/popup_route/legend_popup_route.dart';
@@ -17,6 +18,8 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<LegendConfiguration> {
   final NavigatorFrame? frame;
   final ModalDependencies? modalDependencies;
+  final RouteInfo? Function(RouteConfig s)? onGenerateRoute;
+  final bool Function(RouteInfo s)? hideRoutes;
 
   @override
   final GlobalKey<NavigatorState> navigatorKey;
@@ -30,6 +33,8 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
     this.modalDependencies,
     required Iterable<RouteInfo> routes,
     required this.navigatorKey,
+    this.onGenerateRoute,
+    this.hideRoutes,
   })  : _routes = routes,
         assert(routes.isNotEmpty);
 
@@ -63,7 +68,7 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
         0,
         LegendRouter.createPage(
           homeRoute,
-          LegendRouter.getRouteWidget(homeRoute, _routes),
+          LegendRouter.getRouteWidget(homeRoute, _routes) ?? notFound,
         ),
       );
     }
@@ -78,7 +83,7 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
           pages: List.of(_pages),
           key: navigatorKey,
           onPopPage: _onPopPage,
-          onGenerateRoute: onGenerateRoute,
+          onGenerateRoute: _onGenerateRoute,
         ),
         current,
       );
@@ -90,15 +95,19 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
       observers: [
         HeroController(),
       ],
-      onGenerateRoute: onGenerateRoute,
+      onGenerateRoute: _onGenerateRoute,
       onGenerateInitialRoutes: (navigator, initialRoute) {
         return [CupertinoPageRoute(builder: (context) => Container())];
       },
     );
   }
 
-  Route<dynamic>? onGenerateRoute(RouteSettings s) {
-    RouteInfo info = LegendRouter.getRouteWidget(s, _routes);
+  Route<dynamic>? _onGenerateRoute(RouteSettings s) {
+    final info = LegendRouter.getRouteWidget(s, _routes);
+
+    if (info is PageRouteInfo) {
+      return ScaffoldRoute(page: info.page, settings: s);
+    }
 
     if (info is ModalRouteInfo) {
       return LegendPopupRoute(
@@ -147,20 +156,6 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
     pushPage(page);
   }
 
-  void pushNamed(String name) {
-    pushPage(
-      LegendRouter.createPage(
-        RouteConfig(name: name),
-        LegendRouter.getRouteWidget(RouteConfig(name: name), _routes),
-      ),
-    );
-  }
-
-  void pushReplacementNamed(String name) {
-    _pages.removeLast();
-    pushNamed(name);
-  }
-
   void popUntil(bool Function(LegendPage<dynamic> route) predicate) {
     for (var page in _pages) {
       if (predicate(page)) {
@@ -176,12 +171,22 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
   Future<void> setNewRoutePath(configuration) {
     List<LegendPage> pages = [];
     for (final RouteConfig s in configuration) {
-      pages.add(
-        LegendRouter.createPage(
-          s,
-          LegendRouter.getRouteWidget(s, _routes),
-        ),
-      );
+      final info = LegendRouter.getRouteWidget(s, _routes) ??
+          onGenerateRoute?.call(s) ??
+          notFound;
+      final hide = hideRoutes?.call(info) ?? false;
+      if (hide) {
+        pages.add(
+          LegendRouter.createPage(s, notFound),
+        );
+      } else {
+        pages.add(
+          LegendRouter.createPage(
+            s,
+            LegendRouter.getRouteWidget(s, _routes) ?? notFound,
+          ),
+        );
+      }
     }
 
     _setPath(pages);
@@ -195,7 +200,7 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
         0,
         LegendRouter.createPage(
           homeRoute,
-          LegendRouter.getRouteWidget(homeRoute, _routes),
+          LegendRouter.getRouteWidget(homeRoute, _routes) ?? notFound,
         ),
       );
     }

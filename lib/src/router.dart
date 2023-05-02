@@ -53,23 +53,20 @@ class LegendRouter extends InheritedWidget {
     String route, {
     Map<String, dynamic>? urlArguments,
     Object? arguments,
-    bool useKey = false,
   }) {
-    if (useKey) {
-      routerDelegate.navigatorKey.currentState?.pushNamed(
-        route,
-        arguments: arguments,
-      );
-      return;
-    }
-
     final _routeConfig = RouteConfig(
       name: route,
       arguments: arguments,
       urlArguments: urlArguments,
     );
 
-    final info = getRouteWidget(_routeConfig, routes);
+    final info = getRouteWidget(_routeConfig, routes) ??
+        routerDelegate.onGenerateRoute?.call(_routeConfig) ??
+        notFound;
+
+    final hideRoute = routerDelegate.hideRoutes?.call(info) ?? false;
+    if (hideRoute) return;
+
     final page = createPage(_routeConfig, info);
 
     routerDelegate.pushPage(page);
@@ -93,70 +90,25 @@ class LegendRouter extends InheritedWidget {
     String route, {
     Map<String, dynamic>? urlArguments,
     Object? arguments,
-    bool useKey = false,
   }) {
-    if (useKey) {
-      routerDelegate.navigatorKey.currentState?.pushReplacementNamed(
-        route,
-        arguments: arguments,
-      );
-      return;
-    }
-
     final _routeConfig = RouteConfig(
       name: route,
       arguments: arguments,
       urlArguments: urlArguments,
     );
 
-    final info = getRouteWidget(_routeConfig, routes);
+    final info = getRouteWidget(_routeConfig, routes) ?? notFound;
     final page = createPage(_routeConfig, info);
 
     routerDelegate.replacePage(page);
-  }
-
-  void pushReplacementNamed(
-    String route, {
-    bool useKey = false,
-  }) {
-    if (useKey) {
-      routerDelegate.navigatorKey.currentState?.pushReplacementNamed(route);
-      return;
-    }
-    routerDelegate.pushReplacementNamed(route);
-  }
-
-  void pushNamed(
-    String route, {
-    Map<String, dynamic>? urlArguments,
-    Object? arguments,
-    bool useKey = false,
-  }) {
-    if (useKey) {
-      routerDelegate.navigatorKey.currentState?.pushNamed(
-        route,
-        arguments: arguments,
-      );
-      return;
-    }
-
-    final _routeConfig = RouteConfig(
-      name: route,
-      arguments: arguments,
-      urlArguments: urlArguments,
-    );
-
-    final info = getRouteWidget(_routeConfig, routes);
-    final page = createPage(_routeConfig, info);
-
-    routerDelegate.pushPage(page);
   }
 
   ///
   /// Delegate Functions
   ///
 
-  static RouteInfo getRouteWidget(RouteSettings s, Iterable<RouteInfo> routes) {
+  static RouteInfo? getRouteWidget(
+      RouteSettings s, Iterable<RouteInfo> routes) {
     for (final RouteInfo routeinfo in routes) {
       if (routeinfo.name == s.name) {
         return routeinfo;
@@ -171,7 +123,7 @@ class LegendRouter extends InheritedWidget {
       }
     }
 
-    return notFound;
+    return null;
   }
 
   static LegendPage<dynamic> createPage(

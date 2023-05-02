@@ -12,3 +12,4 @@ export 'package:legend_router/src/entities/frames/scaffold_frame.dart';
 export 'package:legend_router/src/global_modal.dart';
 export 'package:legend_router/src/information_parser.dart';
 export 'package:legend_router/src/modal_router.dart';
+export 'package:legend_router/src/entities/routes/route_config.dart';
