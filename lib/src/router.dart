@@ -74,17 +74,12 @@ class LegendRouter extends InheritedWidget {
 
   bool get isFirstOnStack => routerDelegate.currentConfiguration.length == 1;
 
-  void popPage({bool useKey = false}) {
-    if (useKey) {
-      routerDelegate.navigatorKey.currentState?.pop();
-      return;
-    }
-    routerDelegate.popRoute();
-  }
+  void popPage() => routerDelegate.popRoute();
 
-  void popUntil(bool Function(LegendPage<dynamic>) predicate) {
-    routerDelegate.popUntil(predicate);
-  }
+  void popUntil(bool Function(LegendPage<dynamic>) predicate) =>
+      routerDelegate.popUntil(predicate);
+
+  void clear() => routerDelegate.clearPages();
 
   void replacePage(
     String route, {

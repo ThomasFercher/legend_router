@@ -167,6 +167,11 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
     notifyListeners();
   }
 
+  void clearPages() {
+    _pages.clear();
+    notifyListeners();
+  }
+
   @override
   Future<void> setNewRoutePath(configuration) {
     List<LegendPage> pages = [];
