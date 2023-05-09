@@ -168,8 +168,10 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
     notifyListeners();
   }
 
-  void clearPages() {
+  void clearPages(LegendPage startPage) {
     _pages.clear();
+    _pages.add(startPage);
+
     notifyListeners();
   }
 

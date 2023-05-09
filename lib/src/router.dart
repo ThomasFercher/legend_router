@@ -79,7 +79,27 @@ class LegendRouter extends InheritedWidget {
   void popUntil(bool Function(LegendPage<dynamic>) predicate) =>
       routerDelegate.popUntil(predicate);
 
-  void clear() => routerDelegate.clearPages();
+  void clear({
+    String route = '/',
+    Map<String, dynamic>? urlArguments,
+    Object? arguments,
+  }) {
+    final _routeConfig = RouteConfig(
+      name: route,
+      arguments: arguments,
+      urlArguments: urlArguments,
+    );
+    final info = getRouteWidget(_routeConfig, routes) ??
+        routerDelegate.onGenerateRoute?.call(_routeConfig) ??
+        notFound;
+
+    final hideRoute = routerDelegate.hideRoutes?.call(info) ?? false;
+    if (hideRoute) return;
+
+    final page = createPage(_routeConfig, info);
+
+    routerDelegate.clearPages(page);
+  }
 
   void replacePage(
     String route, {
