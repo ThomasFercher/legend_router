@@ -157,6 +157,7 @@ class LegendRouterDelegate extends RouterDelegate<LegendConfiguration>
   }
 
   void popUntil(bool Function(LegendPage<dynamic> route) predicate) {
+    _pages.removeLast();
     for (var page in _pages) {
       if (predicate(page)) {
         break;
